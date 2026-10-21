@@ -1,0 +1,6 @@
+{
+  "name": "Argon Prompt Optimizer",
+  "description": "Transform rough ideas and goals into the clear, outcome-driven prompts Gemini 4 Argon most wants to receive.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
