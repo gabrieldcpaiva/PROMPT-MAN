@@ -7,36 +7,48 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowRight, Check, Copy, RotateCcw, AlertCircle, Loader2 } from 'lucide-react';
 
 type RequestStatus = 'idle' | 'loading' | 'success' | 'error';
-type CompilerMode = 'riff' | 'system' | 'deliverable';
+type CompilerMode = 'argon' | 'riff' | 'system' | 'deliverable';
 
 interface ModeOption {
   id: CompilerMode;
   label: string;
   sublabel: string;
   placeholder: string;
+  ctaLabel: string;
 }
 
 const COMPILER_MODES: ModeOption[] = [
   {
+    id: 'argon',
+    label: 'Goal-First Argon',
+    sublabel: 'Clear outcome, essential constraints, open method & creativity',
+    placeholder:
+      'Describe the result you want in your own words—for example: "I need to explain our database migration delay to non-technical executives without sounding defensive, while making sure they approve an extra two weeks for testing."',
+    ctaLabel: 'Optimize prompt',
+  },
+  {
     id: 'riff',
     label: 'Pure Riff / Deep Think',
-    sublabel: 'Exploration, physics, architecture — zero fluff',
+    sublabel: '3-Block Compiler (#SUBSTRATE · #VETOES · #DESTINATION) — exploration & physics',
     placeholder:
-      'Drop 3 words of vague intuition or 50 lines of raw theoretical tension—e.g., "why do distributed consensus protocols mirror thermodynamic phase transitions, and what happens if we design state sync around entropy dissipation instead of leader election?"',
+      'Drop 3 words of vague intuition or 50 lines of raw theoretical tension—e.g., "why do distributed consensus protocols mirror thermodynamic phase transitions, and what happens if we design state sync around entropy dissipation?"',
+    ctaLabel: 'Compile Signal',
   },
   {
     id: 'system',
     label: 'System / Code Build',
-    sublabel: 'Direct execution, technical precision',
+    sublabel: '3-Block Compiler — direct execution & technical precision',
     placeholder:
       'Describe the system, mechanics, or architecture you want built—e.g., "local-first canvas where nodes act like coupled oscillators, zero React re-render lag on 60fps drag, strict keyboard-first command grammar."',
+    ctaLabel: 'Compile Signal',
   },
   {
     id: 'deliverable',
     label: 'High-Stakes Deliverable',
-    sublabel: 'Sharp, persuasive, immediate impact',
+    sublabel: '3-Block Compiler — sharp, persuasive, immediate impact',
     placeholder:
       'State the high-stakes outcome and tension—e.g., "board memo killing our legacy multi-region rewrite without losing engineering credibility; shift focus to deterministic edge caching in 4 weeks."',
+    ctaLabel: 'Compile Signal',
   },
 ];
 
@@ -49,12 +61,12 @@ interface OptimizeResponse {
 
 export default function App() {
   const [rawInput, setRawInput] = useState<string>('');
-  const [mode, setMode] = useState<CompilerMode>('riff');
+  const [mode, setMode] = useState<CompilerMode>('argon');
   const [optimizedPrompt, setOptimizedPrompt] = useState<string>('');
   const [status, setStatus] = useState<RequestStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [configuredModel, setConfiguredModel] = useState<string>('gemini-2.5-pro');
+  const [configuredModel, setConfiguredModel] = useState<string>('gemini-4-argon');
 
   const inputTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const outputTextareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -86,7 +98,7 @@ export default function App() {
     };
   }, []);
 
-  const handleCompile = async (e?: React.FormEvent) => {
+  const handleOptimize = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
@@ -98,7 +110,7 @@ export default function App() {
     const trimmed = rawInput.trim();
     if (!trimmed) {
       setStatus('error');
-      setErrorMessage('Drop a raw thought, intuition, or brain dump to compile.');
+      setErrorMessage('Please enter a goal or rough request to optimize.');
       inputTextareaRef.current?.focus();
       return;
     }
@@ -136,13 +148,13 @@ export default function App() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || `Signal compilation failed with status ${response.status}. Please try again.`
+          data.error || `Optimization failed with status ${response.status}. Please try again.`
         );
       }
 
       if (!data.optimizedPrompt || !data.optimizedPrompt.trim()) {
         throw new Error(
-          'The compiler returned an empty signal. Add a bit more context and try again.'
+          'The model returned an empty prompt. Please clarify your goal slightly and try again.'
         );
       }
 
@@ -155,7 +167,7 @@ export default function App() {
       const message =
         err instanceof Error
           ? err.message
-          : 'An unexpected error occurred while compiling your signal.';
+          : 'An unexpected error occurred while optimizing your prompt.';
       setStatus('error');
       setErrorMessage(message);
     }
@@ -164,7 +176,7 @@ export default function App() {
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
-      handleCompile();
+      handleOptimize();
     }
   };
 
@@ -187,7 +199,7 @@ export default function App() {
         setCopied(false);
       }, 2200);
     } catch {
-      setErrorMessage('Could not copy automatically. Please select the compiled prompt text and copy manually.');
+      setErrorMessage('Could not copy automatically. Please select the optimized prompt text and copy manually.');
     }
   };
 
@@ -220,7 +232,7 @@ export default function App() {
           href="#workbench"
           className="font-display text-lg font-semibold tracking-tight text-[#141413] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C84B31]"
         >
-          PROMPT MAN
+          Argon Prompt Optimizer
         </a>
 
         {/* Zone 2: Concise single-line navigation links */}
@@ -229,19 +241,19 @@ export default function App() {
             href="#workbench"
             className="hover:text-[#141413] hover:underline underline-offset-4 transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C84B31]"
           >
-            Signal Compiler
+            Workbench
           </a>
           <a
-            href="#architecture"
+            href="#principles"
             className="hover:text-[#141413] hover:underline underline-offset-4 transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C84B31]"
           >
-            Boundary Architecture
+            Prompting Principles
           </a>
           <a
             href="#setup"
             className="hover:text-[#141413] hover:underline underline-offset-4 transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C84B31]"
           >
-            Runtime Config
+            Local Setup
           </a>
         </nav>
 
@@ -254,7 +266,7 @@ export default function App() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#E6E2DC] bg-white text-[#141413] hover:bg-[#F3EFEA] disabled:opacity-45 disabled:pointer-events-none transition-opacity duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C84B31]"
           >
             <RotateCcw className="w-4 h-4" aria-hidden="true" />
-            <span>Reset</span>
+            <span>Start over</span>
           </button>
         </div>
       </header>
@@ -267,21 +279,21 @@ export default function App() {
             className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] font-semibold tracking-tight text-[#141413] leading-[1.12] mb-3"
             style={{ textWrap: 'balance' }}
           >
-            Zero-noise cognitive compiler for frontier reasoning models.
+            Speak to Gemini 4 Argon the way it thinks best.
           </h1>
           <p className="text-base sm:text-[17px] text-[#65625D] leading-relaxed max-w-[68ch]">
-            Drop 3 words of raw intuition or 50 lines of chaotic brainstorming. PROMPT MAN strips away filler and compiles your intent into sharp boundary conditions—<span className="text-[#141413] font-medium">The Substrate</span>, <span className="text-[#141413] font-medium">The Vetoes</span>, and <span className="text-[#141413] font-medium">The Destination</span>—leaving the path of least action wide open.
+            Describe what you want to achieve in your own words. This workbench turns your rough request into the prompt <span className="text-[#141413] font-medium">Gemini 4 Argon</span> most wants to receive—preserving your intent while leaving reasoning and creative execution wide open.
           </p>
         </div>
 
-        {/* 3-Way Mode Selector Segmented Control */}
+        {/* Mode Selector Segmented Control */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
             <span
               id="compiler-mode-label"
               className="text-xs font-mono text-[#65625D] tracking-tight"
             >
-              Compilation vector <span aria-hidden="true">·</span>{' '}
+              Optimization lens <span aria-hidden="true">·</span>{' '}
               <span className="text-[#141413]">{activeModeObj.sublabel}</span>
             </span>
           </div>
@@ -316,19 +328,19 @@ export default function App() {
 
         {/* Side-by-Side Split Workbench on Desktop, Stacked on Mobile */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {/* Left Column: Raw Signal Input Pane */}
+          {/* Left Column: User Input Pane */}
           <section
             aria-labelledby="input-heading"
             className="lg:col-span-6 flex flex-col justify-between bg-white border border-[#E6E2DC] rounded-xl p-6 sm:p-7"
           >
-            <form onSubmit={handleCompile} className="flex flex-col flex-1" noValidate>
+            <form onSubmit={handleOptimize} className="flex flex-col flex-1" noValidate>
               <div className="flex items-baseline justify-between gap-4 mb-2">
                 <label
                   id="input-heading"
-                  htmlFor="raw-signal-input"
+                  htmlFor="rough-request-input"
                   className="font-display text-lg font-semibold text-[#141413]"
                 >
-                  Raw human intuition
+                  Your goal or rough request
                 </label>
                 <span className="text-xs font-mono text-[#65625D] tabular-nums">
                   {rawInput.length.toLocaleString()} chars
@@ -336,13 +348,13 @@ export default function App() {
               </div>
 
               <p id="input-description" className="text-sm text-[#65625D] mb-4">
-                Unfiltered notes, half-formed physics, or chaotic brain dumps. No polite phrasing required.
+                Share the outcome you want, who it is for, and any real constraints that matter.
               </p>
 
               <textarea
                 ref={inputTextareaRef}
-                id="raw-signal-input"
-                name="rawSignal"
+                id="rough-request-input"
+                name="roughRequest"
                 rows={12}
                 value={rawInput}
                 onChange={(e) => {
@@ -376,7 +388,7 @@ export default function App() {
               {/* Action Bar */}
               <div className="pt-2 flex flex-wrap items-center justify-between gap-4">
                 <span id="input-shortcut-hint" className="text-xs font-mono text-[#65625D] tabular-nums">
-                  Cmd/Ctrl + Enter to compile
+                  Press Cmd/Ctrl + Enter to optimize
                 </span>
 
                 <div className="flex items-center gap-3 ml-auto">
@@ -398,11 +410,11 @@ export default function App() {
                     {status === 'loading' ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                        <span>Compiling Signal...</span>
+                        <span>Optimizing with Argon...</span>
                       </>
                     ) : (
                       <>
-                        <span>Compile Signal</span>
+                        <span>{activeModeObj.ctaLabel}</span>
                         <ArrowRight className="w-4 h-4" aria-hidden="true" />
                       </>
                     )}
@@ -412,7 +424,7 @@ export default function App() {
             </form>
           </section>
 
-          {/* Right Column: Compiled Boundary-Condition Output Pane */}
+          {/* Right Column: Optimized Prompt Output Pane */}
           <section
             aria-labelledby="output-heading"
             aria-live="polite"
@@ -422,54 +434,47 @@ export default function App() {
               <div className="flex items-baseline justify-between gap-4 mb-2">
                 <label
                   id="output-heading"
-                  htmlFor="compiled-prompt-output"
+                  htmlFor="optimized-prompt-output"
                   className="font-display text-lg font-semibold text-[#141413]"
                 >
-                  Compiled boundary conditions
+                  Prompt for Gemini 4 Argon
                 </label>
                 <span className="text-xs text-[#65625D]">
-                  Compiler engine <span aria-hidden="true">·</span>{' '}
+                  Target model <span aria-hidden="true">·</span>{' '}
                   <span className="font-mono text-[#141413]">{configuredModel}</span>
                 </span>
               </div>
 
               <p id="output-description" className="text-sm text-[#65625D] mb-4">
-                Structured into <span className="font-mono text-xs text-[#141413]"># THE SUBSTRATE</span>, <span className="font-mono text-xs text-[#141413]"># THE VETOES</span>, and <span className="font-mono text-xs text-[#141413]"># THE DESTINATION (/goal)</span>. Editable before copying.
+                Ready to copy directly into Gemini 4 Argon. You can edit any detail below before copying.
               </p>
 
               {/* State-driven Output Body */}
               {status === 'loading' ? (
                 <div
                   role="status"
-                  aria-label="Compiling your cognitive signal into boundary conditions"
+                  aria-label="Optimizing your prompt for Gemini 4 Argon"
                   className="flex-1 min-h-[280px] rounded-lg border border-[#E6E2DC] bg-[#FCFBF9] p-5 flex flex-col justify-between"
                 >
-                  <div className="space-y-4 animate-pulse">
-                    <div className="h-3.5 bg-[#D8D3CA] rounded w-1/3" />
-                    <div className="space-y-2.5">
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-full" />
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-11/12" />
-                    </div>
-                    <div className="h-3.5 bg-[#D8D3CA] rounded w-1/4 pt-2" />
-                    <div className="space-y-2.5">
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-5/6" />
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-4/5" />
-                    </div>
-                    <div className="h-3.5 bg-[#D8D3CA] rounded w-2/5 pt-2" />
-                    <div className="space-y-2.5">
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-full" />
-                      <div className="h-3.5 bg-[#E6E2DC] rounded w-3/4" />
+                  <div className="space-y-3.5 animate-pulse">
+                    <div className="h-4 bg-[#E6E2DC] rounded w-3/4" />
+                    <div className="h-4 bg-[#E6E2DC] rounded w-full" />
+                    <div className="h-4 bg-[#E6E2DC] rounded w-11/12" />
+                    <div className="h-4 bg-[#E6E2DC] rounded w-4/5" />
+                    <div className="pt-3 space-y-3">
+                      <div className="h-4 bg-[#E6E2DC] rounded w-full" />
+                      <div className="h-4 bg-[#E6E2DC] rounded w-2/3" />
                     </div>
                   </div>
                   <p className="text-xs font-mono text-[#65625D] pt-6">
-                    Stripping noise and extrapolating boundary conditions via {configuredModel}...
+                    Distilling goal, essential context, and outcome criteria with {configuredModel}...
                   </p>
                 </div>
               ) : optimizedPrompt ? (
                 <textarea
                   ref={outputTextareaRef}
-                  id="compiled-prompt-output"
-                  name="compiledPrompt"
+                  id="optimized-prompt-output"
+                  name="optimizedPrompt"
                   rows={12}
                   value={optimizedPrompt}
                   onChange={(e) => {
@@ -477,23 +482,16 @@ export default function App() {
                     if (copied) setCopied(false);
                   }}
                   aria-describedby="output-description"
-                  className="w-full flex-1 min-h-[280px] resize-y rounded-lg border border-[#D8D3CA] bg-[#FCFBF9] px-4 py-3.5 font-mono text-[13.5px] sm:text-sm text-[#141413] leading-relaxed focus:bg-white focus:border-[#C84B31] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C84B31]/25 transition-opacity duration-150"
+                  className="w-full flex-1 min-h-[280px] resize-y rounded-lg border border-[#D8D3CA] bg-[#FCFBF9] px-4 py-3.5 text-[15px] sm:text-base text-[#141413] leading-relaxed focus:bg-white focus:border-[#C84B31] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C84B31]/25 transition-opacity duration-150"
                 />
               ) : (
                 <div className="flex-1 min-h-[280px] rounded-lg border border-dashed border-[#D8D3CA] bg-[#FAF8F5]/60 px-6 py-8 flex flex-col items-center justify-center text-center">
-                  <p className="font-display text-base font-semibold text-[#141413] mb-2">
-                    Awaiting raw signal
+                  <p className="font-display text-base font-semibold text-[#141413] mb-1.5">
+                    Awaiting your request
                   </p>
-                  <p className="text-sm text-[#65625D] max-w-sm leading-relaxed mb-4">
-                    Select a compilation mode, drop your raw thought on the left, and hit <span className="font-semibold text-[#141413]">Compile Signal</span>.
+                  <p className="text-sm text-[#65625D] max-w-sm leading-relaxed">
+                    Enter your goal on the left and select <span className="font-semibold text-[#141413]">{activeModeObj.ctaLabel}</span>. Your ready-to-copy prompt will appear here in an editable field.
                   </p>
-                  <div className="text-xs font-mono text-[#65625D] space-x-2">
-                    <span># THE SUBSTRATE</span>
-                    <span aria-hidden="true">·</span>
-                    <span># THE VETOES</span>
-                    <span aria-hidden="true">·</span>
-                    <span># THE DESTINATION</span>
-                  </div>
                 </div>
               )}
             </div>
@@ -503,10 +501,10 @@ export default function App() {
               <div className="text-xs font-mono text-[#65625D] tabular-nums">
                 {optimizedPrompt ? (
                   <span>
-                    {optimizedPrompt.length.toLocaleString()} chars <span aria-hidden="true">·</span> Direct editable buffer
+                    {optimizedPrompt.length.toLocaleString()} chars <span aria-hidden="true">·</span> Editable before copying
                   </span>
                 ) : (
-                  <span>Zero procedural checklists · Boundary conditions only</span>
+                  <span>Returns pure prompt text without commentary</span>
                 )}
               </div>
 
@@ -518,7 +516,7 @@ export default function App() {
                     className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-semibold text-[#65625D] hover:text-[#141413] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C84B31]"
                   >
                     <RotateCcw className="w-4 h-4" aria-hidden="true" />
-                    <span>Reset</span>
+                    <span>Start over</span>
                   </button>
                 )}
 
@@ -540,7 +538,7 @@ export default function App() {
                   ) : (
                     <>
                       <Copy className="w-4 h-4" aria-hidden="true" />
-                      <span>Copy compiled prompt</span>
+                      <span>Copy prompt</span>
                     </>
                   )}
                 </button>
@@ -549,50 +547,50 @@ export default function App() {
           </section>
         </div>
 
-        {/* Editorial Reference Section: 3-Block Boundary Architecture */}
+        {/* Editorial Reference Section: Goal-First Prompting Principles */}
         <section
-          id="architecture"
-          aria-labelledby="architecture-heading"
+          id="principles"
+          aria-labelledby="principles-heading"
           className="mt-16 pt-12 border-t border-[#E6E2DC]"
         >
           <div className="max-w-2xl mb-8">
             <h2
-              id="architecture-heading"
+              id="principles-heading"
               className="font-display text-2xl font-semibold tracking-tight text-[#141413] mb-2"
               style={{ textWrap: 'balance' }}
             >
-              The Three-Block Boundary Architecture
+              How Gemini 4 Argon prefers to be prompted
             </h2>
             <p className="text-sm sm:text-base text-[#65625D] leading-relaxed">
-              Frontier reasoning models hate being micromanaged on the journey. They perform at their peak when given high-dimensional boundary conditions and left free to find the path of least action.
+              Frontier reasoning models work best when given a clear destination rather than a rigid script. Every optimization follows three editorial rules:
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="font-mono text-sm font-semibold text-[#141413] mb-2">
-                01. # THE SUBSTRATE
+              <h3 className="font-display text-base font-semibold text-[#141413] mb-2">
+                01. Outcome over procedure
               </h3>
               <p className="text-sm text-[#65625D] leading-relaxed">
-                Defines the initial state, domain physics, core tension to resolve, and unspoken emotional or technical subtext—translating vague vibes into concrete parameters without generic filler words.
+                Defines what a successful result must accomplish, who it serves, and why it matters—without micromanaging the reasoning steps or forcing boilerplate checklists.
               </p>
             </div>
 
             <div>
-              <h3 className="font-mono text-sm font-semibold text-[#141413] mb-2">
-                02. # THE VETOES
+              <h3 className="font-display text-base font-semibold text-[#141413] mb-2">
+                02. Essential constraints only
               </h3>
               <p className="text-sm text-[#65625D] leading-relaxed">
-                Establishes 3 to 4 sharp negative constraints—explicitly forbidding the specific clichés, AI slop, fake roleplay, or lazy defaults that normally degrade outputs in your target domain.
+                Preserves your stated tone, domain, and hard requirements while leaving creative direction and structural execution open where you did not restrict them.
               </p>
             </div>
 
             <div>
-              <h3 className="font-mono text-sm font-semibold text-[#141413] mb-2">
-                03. # THE DESTINATION (/goal)
+              <h3 className="font-display text-base font-semibold text-[#141413] mb-2">
+                03. Proportional &amp; assumption-smart
               </h3>
               <p className="text-sm text-[#65625D] leading-relaxed">
-                States the final boundary condition: what the finished output must achieve, how it feels when experienced, and the exact shape of the deliverable—while leaving internal reasoning open.
+                Keeps simple requests concise and resolves minor ambiguities with sensible assumptions, returning a ready-to-copy prompt with zero preamble or commentary.
               </p>
             </div>
           </div>
@@ -606,10 +604,10 @@ export default function App() {
         >
           <div className="max-w-xl">
             <h2 id="setup-heading" className="font-display text-base font-semibold text-[#141413] mb-1">
-              Runtime &amp; model configuration
+              Server-side configuration &amp; local execution
             </h2>
             <p className="leading-relaxed">
-              All compilation calls run server-side via <code className="font-mono text-xs text-[#141413]">POST /api/optimize</code>. Set <code className="font-mono text-xs text-[#141413]">GEMINI_API_KEY</code> in your environment, and optionally override <code className="font-mono text-xs text-[#141413]">GEMINI_MODEL</code> (defaults to <code className="font-mono text-xs text-[#141413]">gemini-2.5-pro</code>).
+              All model requests execute on the server via <code className="font-mono text-xs text-[#141413]">POST /api/optimize</code> using credentials from environment variables (<code className="font-mono text-xs text-[#141413]">GEMINI_API_KEY</code> and <code className="font-mono text-xs text-[#141413]">GEMINI_MODEL</code>, defaulting to <code className="font-mono text-xs text-[#141413]">gemini-4-argon</code>).
             </p>
           </div>
 
